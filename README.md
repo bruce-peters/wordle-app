@@ -1,70 +1,57 @@
-# Getting Started with Create React App
+# Wordle Clone
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A clone of the word game Wordle, built with React (Create React App) and hosted on Firebase Hosting.
 
-## Available Scripts
+**Play it:** https://wordle-app-i.web.app/
 
-In the project directory, you can run:
+## How it plays
 
-### `npm start`
+- Guess a random five-letter word in six tries. Type on your keyboard or click the on-screen keys (`Del` deletes, `Enter` submits).
+- After each guess the tiles turn green (right letter, right spot), yellow (in the word, wrong spot) or gray (not in the word). The on-screen keyboard keeps track of the letters you have used.
+- A guess must be a real word from the allowed-guess list. Otherwise the row shakes and the guess doesn't count.
+- A new word is picked every time the page loads. The code also has a daily-word mode (`isDaily` in `src/pages/WordlePage.js`, off by default) that seeds the word with the date.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Run it
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Prerequisites: Node.js and npm. Tested with Node 22.22 / npm 10.9. No `NODE_OPTIONS=--openssl-legacy-provider` flag is needed.
 
-### `npm test`
+```bash
+npm ci
+npm start          # dev server at http://localhost:3000
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Production build:
 
-### `npm run build`
+```bash
+npm run build      # outputs to build/
+npx http-server build -p 8080   # or any static file server
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+`npm run build` prints some ESLint warnings but finishes. With `CI=true` set (as most CI services do), Create React App treats those warnings as errors and the build fails. Run it with `CI=false npm run build` there.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Deploy
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+`firebase.json` serves `build/` as a single-page app, and `.firebaserc` points at the Firebase project `wordle-app-i`. With the [Firebase CLI](https://firebase.google.com/docs/cli) logged in to an account that has access to that project:
 
-### `npm run eject`
+```bash
+npm run build
+firebase deploy --only hosting
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+(Not run here, because it needs the project owner's Firebase login.)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Project structure
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```
+src/
+  pages/WordlePage.js        game state: keyword, guesses, key handling, win/lose
+  components/WordleBoard.js  6x5 grid of WordRow / LetterBox tiles
+  components/WordRow.js      green / yellow / gray scoring for one guess
+  components/Keyboard.js     on-screen keyboard with letter coloring
+  components/Results.js      win / lose panel
+  functions/wordList.js      random (optionally seeded) word picker and guess validation
+  data/wordList.json         2,315 possible answers
+  data/allowedGuesses.json   12,484 accepted guesses
+public/                      index.html, icons
+firebase.json, .firebaserc   Firebase Hosting config
+```
