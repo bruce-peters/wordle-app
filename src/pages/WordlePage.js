@@ -23,8 +23,14 @@ export const WordlePage = () => {
   const [gameOver, setGameOver] = useState(false);
   const [results, setResults] = useState(new GameResults(false, 6, guesses, keyWord));
   const [isShaking, setIsShaking] = useState(null);
+  const pageRef = useRef(null);
 
   const isDaily = false;
+
+  //focus the page on load so physical keyboard input works without clicking first
+  useEffect(() => {
+    pageRef.current?.focus();
+  }, [])
 
   //set the word
   useEffect(() => {
@@ -105,7 +111,7 @@ export const WordlePage = () => {
   }
 
   return (
-    <div className='wordle-page' onKeyDown={handleKeyPress} tabIndex={0}>
+    <div className='wordle-page' onKeyDown={handleKeyPress} tabIndex={0} ref={pageRef}>
       <WordleBoard keyWord={keyWord} guesses={guesses} currentGuessIndex={currentGuessIndex} isShaking={isShaking}/>
       <Keyboard handleKeyPress={handleKeyPress} guesses={guesses} currentGuessIndex={currentGuessIndex} keyWord={keyWord} />
       {
